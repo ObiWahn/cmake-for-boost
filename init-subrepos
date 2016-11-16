@@ -1,0 +1,9 @@
+#!/bin/bash
+
+git submodule init
+( cd boost && git submodule init )
+echo "this will take some time -- go and ge some coffee"
+git submodule update --recursive
+
+#TODO add ignore dirty to .git/config
+#ignore = dirty

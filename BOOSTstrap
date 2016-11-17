@@ -22,6 +22,7 @@ boost_strap(){
             git submodule update --recursive
             ( cd boost && git submodule init )
             git submodule update --recursive
+            git config submodule.boost.ignore dirty
         ;;
         bootstrap)
             cd boost || exit 1

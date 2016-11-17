@@ -25,7 +25,7 @@ if(CMAKE_BOOST_USE_SYSTEM_BOOST)
 endif()
 
 
-if(not CMAKE_BOOST_USE_SYSTEM_BOOST)
+if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
 # boost not found we need to povide the vars that would otherwise be
 # provided by the FindBoost module.
     message(STATUS "using external boost")
@@ -54,9 +54,9 @@ if(not CMAKE_BOOST_USE_SYSTEM_BOOST)
     ## create list form components and iterate
     ## boost system 
     ##target_compile_definitions(Boost::system PRIVATE "BOOST_SYSTEM_STATIC_LINK=1")
-    add_library(Boost::system static
+    add_library(Boost_system
         libs/system/src/error_code.cpp
     )
-    target_link_libraries(Boost::system PUBLIC Boost::boost Boost::disable_autolinking)
+    target_link_libraries(Boost_system PUBLIC Boost::boost Boost::disable_autolinking)
 
 endif()

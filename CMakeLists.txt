@@ -19,16 +19,15 @@ if(CMAKE_BOOST_USE_SYSTEM_BOOST)
 
     if(Boost_FOUND)
         #boost found we are good
-        message(STATUS "using system's boost")
+        message(STATUS "Using your system's boost library.")
     else()
         # TODO - automatic fallback?
-        message(FATAL "your system does not provide boost")
+        message(STATUS "Your system does not provide the boost library.")
         set(CMAKE_BOOST_USE_SYSTEM_BOOST OFF)
     endif()
 endif()
 
-if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST AND NOT _CMAKE_BOOST_INCLUDED)
-    set(_CMAKE_BOOST_INCLUDED TRUE)
+if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
     # boost not found we need to povide the vars that would otherwise be
     # provided by the FindBoost module.
 
@@ -49,16 +48,20 @@ if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST AND NOT _CMAKE_BOOST_INCLUDED)
     set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(Boost_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
-    add_library(boost_boost INTERFACE)
-    target_include_directories(boost_boost INTERFACE ${Boost_INCLUDE_DIRS})
-    set_target_properties(boost_boost PROPERTIES
-        INTERFACE_COMPILE_DEFINITIONS "BOOST_SYSTEM_STATIC_LINK=1" #FIXME - shared
-    )
+    if(NOT TARGET boost_boost)
+        add_library(boost_boost INTERFACE)
+        target_include_directories(boost_boost INTERFACE ${Boost_INCLUDE_DIRS})
+        set_target_properties(boost_boost PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS "BOOST_SYSTEM_STATIC_LINK=1" #FIXME - shared
+        )
+    endif()
 
-    add_library(boost_system
-        libs/system/src/error_code.cpp
-    )
-    target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
+    if(NOT TARGET boost_system)
+        add_library(boost_system
+            libs/system/src/error_code.cpp
+        )
+        target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
+    endif()
 
     add_library(Boost::boost ALIAS boost_boost)
     add_library(Boost::system ALIAS boost_system)

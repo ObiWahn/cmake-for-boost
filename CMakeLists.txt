@@ -30,14 +30,8 @@ if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
 # provided by the FindBoost module.
     message(STATUS "using external boost")
     set(Boost_FOUND TRUE)
-
-    add_library(Boost::boost INTERFACE IMPORTED)
-    set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    set(Boost_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-    set_target_properties(Boost::boost PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}"
-    )
-
+    
+    
     if(NOT TARGET Boost::diagnostic_definitions)
         add_library(Boost::diagnostic_definitions INTERFACE IMPORTED)
         add_library(Boost::disable_autolinking INTERFACE IMPORTED)
@@ -49,14 +43,27 @@ if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
             INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB=1")
     endif()
 
+    
+    set(Boost_INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/libs/system/include"
+    )
+   
+    set(Boost_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+
+    add_library(boost_boost INTERFACE)
+    target_include_directories(boost_boost INTERFACE ${Boost_INCLUDE_DIRS})
 
    
     ## create list form components and iterate
     ## boost system 
     ##target_compile_definitions(Boost::system PRIVATE "BOOST_SYSTEM_STATIC_LINK=1")
-    add_library(Boost_system
+    add_library(boost_system
         libs/system/src/error_code.cpp
     )
-    target_link_libraries(Boost_system PUBLIC Boost::boost Boost::disable_autolinking)
+    target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
+
+    add_library(Boost::boost ALIAS boost_boost)
+    add_library(Boost::system ALIAS boost_system)
 
 endif()

@@ -1,30 +1,12 @@
 project(boost)
-cmake_minimum_required(VERSION 3.2)
-
-set(CMAKE_BOOST_USE_SYSTEM_BOOST OFF CACHE BOOL "use boost provided by system")
-set(CMAKE_BOOST_COMPONENTS "" CACHE STRING "list of componets to build")
+cmake_minimum_required(VERSION 3.6)
 
 # TODO
 # - proivde shared libs
 # - add more libs that require to be build .e.g filesystem
 # - add component interface
 
-if(CMAKE_BOOST_USE_SYSTEM_BOOST)
-    message(STATUS "== Boost Components: ${CMAKE_BOOST_COMPONENTS}")
-    find_package(Boost REQUIRED COMPONENTS ${CMAKE_BOOST_COMPONENTS})
-
-    if(Boost_FOUND)
-        #boost found we are good
-        message(STATUS "== Using Boost provided by your system.")
-        message(STATUS "== Providing link targets to: ${Boost_LIBRARIES}")
-    else()
-        # TODO - automatic fallback?
-        message(FATAL_ERROR "== Your system does not provide Boost.")
-        #set(CMAKE_BOOST_USE_SYSTEM_BOOST OFF)
-    endif()
-endif()
-
-if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST AND NOT _CMAKE_BOOST_INCLUDED)
+if(NOT Boost_FOUND AND NOT _CMAKE_BOOST_INCLUDED)
     set(_CMAKE_BOOST_INCLUDED TRUE)
     # boost not found we need to povide the vars that would otherwise be
     # provided by the FindBoost module.
@@ -59,5 +41,4 @@ if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST AND NOT _CMAKE_BOOST_INCLUDED)
 
     add_library(Boost::boost ALIAS boost_boost)
     add_library(Boost::system ALIAS boost_system)
-
 endif()

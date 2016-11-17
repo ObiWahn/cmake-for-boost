@@ -1,37 +1,17 @@
 project(boost)
-cmake_minimum_required(VERSION 3.2)
-
-option(CMAKE_BOOST_USE_SYSTEM_BOOST OFF)
-option(CMAKE_BOOST_COMPONENTS "")
+cmake_minimum_required(VERSION 3.6)
 
 # TODO
 # - proivde shared libs
 # - add more libs that require to be build .e.g filesystem
 # - add component interface
 
-if(CMAKE_BOOST_USE_SYSTEM_BOOST)
-    #TODO really required - test!! maybe we get rid of the 3 lines
-    if(CMAKE_BOOST_COMPONENTS)
-        find_package(Boost REQUIRED COMPONENTS ${CMAKE_BOOST_COMPONENTS})
-    else()
-        find_package(Boost Boost_FIND_REQUIRED)
-    endif()
-
-    if(Boost_FOUND)
-        #boost found we are good
-        message(STATUS "Using your system's boost library.")
-    else()
-        # TODO - automatic fallback?
-        message(STATUS "Your system does not provide the boost library.")
-        set(CMAKE_BOOST_USE_SYSTEM_BOOST OFF)
-    endif()
-endif()
-
-if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
+if(NOT Boost_FOUND AND NOT _CMAKE_BOOST_INCLUDED)
+    set(_CMAKE_BOOST_INCLUDED TRUE)
     # boost not found we need to povide the vars that would otherwise be
     # provided by the FindBoost module.
 
-    message(STATUS "using external boost")
+    message(STATUS "== Using Boost provided by cmake-for-boost")
     set(Boost_FOUND TRUE)
 
     if(NOT TARGET Boost::diagnostic_definitions)
@@ -65,5 +45,4 @@ if(NOT CMAKE_BOOST_USE_SYSTEM_BOOST)
 
     add_library(Boost::boost ALIAS boost_boost)
     add_library(Boost::system ALIAS boost_system)
-
 endif()

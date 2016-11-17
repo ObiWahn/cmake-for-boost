@@ -43,7 +43,7 @@ create(){
 
     git rm include/boost
     mkdir include
-    cp -r boost/boost include
+    cp -L -r boost/boost include
 
     git rm libs
     mkdir libs

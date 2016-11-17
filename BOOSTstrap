@@ -26,8 +26,8 @@ boost_strap(){
         ;;
         bootstrap)
             cd boost || exit 1
-            .\bootstrap
-            .\b2 headers
+            ./bootstrap.sh
+            ./b2 headers
         ;;
         *)
             usage

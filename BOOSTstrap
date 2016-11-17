@@ -1,0 +1,61 @@
+#!/bin/bash
+
+
+boost_strap(){
+    local action=$1
+    local version=$2
+
+    case "$action" in
+        create)
+            [[ -n $version ]] || usage
+            create "$version"
+        ;;
+        undo)
+            git clean -fd
+            git checkout master
+            git reset --hard HEAD
+            git branch -D boost_${version}_bootstrapped
+        ;;
+        init)
+            git submodule init
+            echo "this will take some time -- go and ge some coffee"
+            git submodule update --recursive
+            ( cd boost && git submodule init )
+            git submodule update --recursive
+        ;;
+        bootstrap)
+            cd boost || exit 1
+            .\bootstrap
+            .\b2 headers
+        ;;
+        *)
+            usage
+        ;;
+    esac
+}
+
+create(){
+    set -e
+    local version=$1
+
+    git checkout -b boost_${version}_bootstrapped
+
+    git rm include/boost
+    mkdir include
+    cp -r boost/boost include
+
+    git rm libs
+    mkdir libs
+
+    for lib in system; do
+        mkdir -p libs/${lib}
+        cp -r boost/libs/${lib}/src libs/${lib}/
+    done
+}
+
+usage(){
+    echo "usage: BOOSTstrap <create|undo> <version> | init"
+    exit 1
+}
+
+boost_strap "$@"

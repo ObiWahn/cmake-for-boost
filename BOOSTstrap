@@ -48,7 +48,7 @@ create(){
     git rm libs
     mkdir libs
 
-    for lib in system; do
+    for lib in system thread; do
         mkdir -p libs/${lib}
         cp -r boost/libs/${lib}/src libs/${lib}/
     done

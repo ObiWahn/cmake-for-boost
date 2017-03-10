@@ -28,17 +28,49 @@ if(NOT Boost_FOUND AND NOT _CMAKE_BOOST_INCLUDED)
     set(Boost_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(Boost_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
-    add_library(boost_boost INTERFACE)
-    target_include_directories(boost_boost INTERFACE ${Boost_INCLUDE_DIRS})
-    set_target_properties(boost_boost PROPERTIES
-        INTERFACE_COMPILE_DEFINITIONS "BOOST_SYSTEM_STATIC_LINK=1" #FIXME - shared
-    )
+    if(NOT TARGET boost_boost)
+        add_library(boost_boost INTERFACE)
+        target_include_directories(boost_boost INTERFACE ${Boost_INCLUDE_DIRS})
+        set_target_properties(boost_boost PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS "BOOST_SYSTEM_STATIC_LINK=1" #FIXME - shared
+        )
+    endif()
 
-    add_library(boost_system
-        libs/system/src/error_code.cpp
-    )
-    target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
+    if(NOT TARGET boost_system)
+        add_library(boost_system
+            libs/system/src/error_code.cpp
+        )
+        target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
+    endif()
+
+    if(NOT TARGET boost_thread)
+        set(boost_thread_src_general
+            libs/thread/src/future.cpp
+            libs/thread/src/tss_null.cpp
+        )
+
+        if(MSVC)
+            set(boost_thread_src_os_specific
+                libs/thread/src/pthread/once_atomic.cpp
+                libs/thread/src/pthread/once.cpp
+                libs/thread/src/pthread/thread.cpp
+            )
+
+            set(boost_thread_src_os_specific
+                libs/thread/src/pthread/tss_dll.cpp
+                libs/thread/src/pthread/tss_pe.cpp
+                libs/thread/src/pthread/thread.cpp
+            )
+        endif()
+
+        add_library(boost_thread
+            ${boost_thread_src_general}
+            ${boost_thread_src_os_specific}
+        )
+        target_link_libraries(boost_thread PUBLIC boost_boost Boost::disable_autolinking)
+    endif()
 
     add_library(Boost::boost ALIAS boost_boost)
     add_library(Boost::system ALIAS boost_system)
+    add_library(Boost::thread ALIAS boost_thread)
 endif()

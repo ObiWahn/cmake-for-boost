@@ -43,6 +43,34 @@ if(NOT Boost_FOUND AND NOT _CMAKE_BOOST_INCLUDED)
         target_link_libraries(boost_system PUBLIC boost_boost Boost::disable_autolinking)
     endif()
 
+    if(NOT TARGET boost_thread)
+        set(boost_thread_src_general
+            libs/thread/src/future.cpp
+            libs/thread/src/tss_null.cpp
+        )
+
+        if(MSVC)
+            set(boost_thread_src_os_specific
+                libs/thread/src/pthread/once_atomic.cpp
+                libs/thread/src/pthread/once.cpp
+                libs/thread/src/pthread/thread.cpp
+            )
+
+            set(boost_thread_src_os_specific
+                libs/thread/src/pthread/tss_dll.cpp
+                libs/thread/src/pthread/tss_pe.cpp
+                libs/thread/src/pthread/thread.cpp
+            )
+        endif()
+
+        add_library(boost_thread
+            ${boost_thread_src_general}
+            ${boost_thread_src_os_specific}
+        )
+        target_link_libraries(boost_thread PUBLIC boost_boost Boost::disable_autolinking)
+    endif()
+
     add_library(Boost::boost ALIAS boost_boost)
     add_library(Boost::system ALIAS boost_system)
+    add_library(Boost::thread ALIAS boost_thread)
 endif()

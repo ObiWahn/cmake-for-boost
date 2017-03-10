@@ -51,14 +51,14 @@ if(NOT Boost_FOUND AND NOT _CMAKE_BOOST_INCLUDED)
 
         if(MSVC)
             set(boost_thread_src_os_specific
+                libs/thread/src/win32/tss_dll.cpp
+                libs/thread/src/win32/tss_pe.cpp
+                libs/thread/src/win32/thread.cpp
+            )
+        else() # we assume pthread of all other cases
+            set(boost_thread_src_os_specific
                 libs/thread/src/pthread/once_atomic.cpp
                 libs/thread/src/pthread/once.cpp
-                libs/thread/src/pthread/thread.cpp
-            )
-
-            set(boost_thread_src_os_specific
-                libs/thread/src/pthread/tss_dll.cpp
-                libs/thread/src/pthread/tss_pe.cpp
                 libs/thread/src/pthread/thread.cpp
             )
         endif()
